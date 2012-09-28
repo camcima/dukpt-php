@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../src/Utility.php';
+require_once __DIR__ . '/../src/Utility.php';
 
 class UtilityTest extends PHPUnit_Framework_TestCase
 {
