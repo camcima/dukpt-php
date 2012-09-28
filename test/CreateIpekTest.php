@@ -1,7 +1,7 @@
 <?php
 
-require __DIR__ . '/../src/DerivedKey.php';
-require __DIR__ . '/../src/KeySerialNumber.php';
+require_once __DIR__ . '/../src/DerivedKey.php';
+require_once __DIR__ . '/../src/KeySerialNumber.php';
 
 class CreateIpekTest extends PHPUnit_Framework_TestCase
 {

@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/../src/Utility.php';
+require_once __DIR__ . '/../src/KeySerialNumber.php';
+
 class DerivedKey
 {
     const _1FFFFF = "1FFFFF";
