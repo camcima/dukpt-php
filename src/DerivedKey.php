@@ -90,7 +90,7 @@ class DerivedKey
      *            Base Derivation Key
      * @return IPEK
      */
-    private static function calculateIpekFromInitialKsn($iKsn, $bdk)
+    public static function calculateIpekFromInitialKsn($iKsn, $bdk)
     {
         $ipek = Utility::tripleDesEncrypt($bdk, $iKsn);
         $xorBdk = Utility::xorHexString($bdk, "C0C0C0C000000000C0C0C0C000000000");
