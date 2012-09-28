@@ -36,7 +36,7 @@ class KeySerialNumber
         $p = $p + $m;
 
         // The transaction counter is a mystery to me. I don't know what on earth this code does, but I want to
-        $this->transactionCounter = "0" . substr($this->unpaddedKsn, -4);
+        $this->transactionCounter = substr($this->unpaddedKsn, -5);
     }
 
     /**
