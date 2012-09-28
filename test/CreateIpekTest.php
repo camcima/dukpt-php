@@ -5,7 +5,7 @@ require_once __DIR__ . '/../src/KeySerialNumber.php';
 
 class CreateIpekTest extends PHPUnit_Framework_TestCase
 {
-    public function createIpek()
+    public function testCreateIpek()
     {
         $iKsn = "FFFF406716000000";
         $bdk = "0123456789ABCDEFFEDCBA9876543210";

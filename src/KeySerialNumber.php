@@ -20,7 +20,7 @@ class KeySerialNumber
     public function __construct($ksn, $ksnDescriptor)
     {
         $this->paddedKsn = $ksn;
-        $this->unpaddedKsn = stripKsn($ksn);
+        $this->unpaddedKsn = self::stripKsn($ksn);
 
         // The base key ID is the first n chars of the unpadded KSN. n is determined by the first two positions $ksn
         // descriptor
