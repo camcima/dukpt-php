@@ -82,8 +82,7 @@ class Utility
      * @return Encrypted data
      */
     public static function desEncrypt($key, $data) {
-        $ivSize = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_CBC);
-        $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
+        $iv = self::hex2bin("0000000000000000");
         $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_CBC, $iv);
         return strtoupper(bin2hex($encryptedData));
     }

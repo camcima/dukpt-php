@@ -37,7 +37,7 @@ class KeySerialNumber
         $surepal = ord($huh);
         $surepal = $surepal & 1;
         $iReallyDontUnderstandThis = chr($surepal);
-        $this->transactionCounter = $iReallyDontUnderstandThis + substr($this->unpaddedKsn, (m + n));
+        $this->transactionCounter = $iReallyDontUnderstandThis + substr($this->unpaddedKsn, ($m + $n));
     }
 
     /**
