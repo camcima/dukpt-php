@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../src/KeySerialNumber.php';
+require_once __DIR__ . '/../src/KeySerialNumber.php';
 
 class KeySerialNumberTest
 {
