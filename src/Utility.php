@@ -144,8 +144,8 @@ class Utility
     public static function shiftRightHexString($str)
     {
         $r = hexdec($str) >> 1;
-        $result = self::padLeft(decbin($r), strlen(decbin(hexdec($str))), '0');
-        return dechex(bindec($result));
+        $result = self::padLeft(dechex($r), strlen($str), '0');
+        return $result;
     }
 
     /**
@@ -159,9 +159,9 @@ class Utility
      */
     public static function tripleDesEncrypt($key, $data)
     {
-        $ivSize = mcrypt_get_iv_size(MCRYPT_3DES, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($ivSize);
-        $encryptedData = mcrypt_encrypt(MCRYPT_3DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_ECB, $iv);
+        $masterKey = self::hex2bin($key);
+        $desKey = substr($masterKey, 0, 16) . substr($masterKey, 0, 8);
+        $encryptedData = mcrypt_encrypt(MCRYPT_3DES, $desKey, self::hex2bin($data), MCRYPT_MODE_ECB);
         return strtoupper(bin2hex($encryptedData));
     }
 

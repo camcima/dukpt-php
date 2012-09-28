@@ -26,7 +26,7 @@ class DerivedKey
         // R8 is Register 8
         // Copy KSNR into R8
         $unpaddedKsn = $ksn->getUnpaddedKsn();
-        $r8 = substr($unpaddedKsn, -16);
+        $r8 = substr($unpaddedKsn, strlen($unpaddedKsn) - 16, 16);
 
         // Clear the 21 right most bits of R8
         $r8 = Utility::andHexStringOffset($r8, self::_E00000, strlen($r8) - 6);
@@ -35,6 +35,7 @@ class DerivedKey
         // Copy the 21 right-most bits of KSNR into R3
         $r3 = Utility::andHexStringOffset($ksn->getTransactionCounter(), self::_1FFFFF, 0);
 
+        // Set the left-most bit of SR, clearing the other 20 bits.
         $shiftr = self::_100000;
 
 
@@ -43,19 +44,19 @@ class DerivedKey
         // Have a look at https://bitbucket.org/joxley/crypto-utils for a description of how I think DUKPT works. If you
         // know better, please tell me <john.oxley@gmail.com>
 
-        while ($shiftr > 0) {
+        while (((int) $shiftr) > 0) {
             $temp = Utility::andHexString($shiftr, $r3);
             if ($temp != 0) {
                 $r8 = Utility::orHexStringOffset($r8, $shiftr, strlen($r8) - 6);
-                $r8a = Utility::xorHexString($r8, substr($curKey, 16, 32));
+                $r8a = Utility::xorHexString($r8, substr($curKey, 16, 16));
                 $r8a = Utility::desEncrypt(substr($curKey, 0, 16), $r8a);
-                $r8a = Utility::xorHexString($r8a, substr($curKey, 16, 32));
+                $r8a = Utility::xorHexString($r8a, substr($curKey, 16, 16));
 
                 $curKey = Utility::xorHexString($curKey, "C0C0C0C000000000C0C0C0C000000000");
 
-                $r8b = Utility::xorHexString(substr($curKey, 16, 32), $r8);
+                $r8b = Utility::xorHexString(substr($curKey, 16, 16), $r8);
                 $r8b = Utility::desEncrypt(substr($curKey, 0, 16), $r8b);
-                $r8b = Utility::xorHexString($r8b, substr($curKey, 16, 32));
+                $r8b = Utility::xorHexString($r8b, substr($curKey, 16, 16));
 
                 $curKey = $r8b . $r8a;
             }

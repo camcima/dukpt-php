@@ -24,20 +24,19 @@ class KeySerialNumber
 
         // The base key ID is the first n chars of the unpadded KSN. n is determined by the first two positions $ksn
         // descriptor
+        $p = 0;
         $n = (int) substr($ksnDescriptor, 0, 1);
-        $this->baseKeyId = substr($this->unpaddedKsn, 0, $n);
-
+        $this->baseKeyId = substr($this->unpaddedKsn, $p, $n);
+        $p = $p + $n;
+        
         // The TRSM ID is the following m chars of the unpadded $ksn. m is determined by the last position in the $ksn
         // descriptor
-        $m = (int) (substr($ksnDescriptor, 2, 3));
-        $this->trsmId = substr($this->unpaddedKsn, $n, $n + $m);
+        $m = (int) (substr($ksnDescriptor, 2, 1));
+        $this->trsmId = substr($this->unpaddedKsn, $p, $m);
+        $p = $p + $m;
 
         // The transaction counter is a mystery to me. I don't know what on earth this code does, but I want to
-        $huh = $this->unpaddedKsn[($m + $n - 1)];
-        $surepal = ord($huh);
-        $surepal = $surepal & 1;
-        $iReallyDontUnderstandThis = chr($surepal);
-        $this->transactionCounter = $iReallyDontUnderstandThis + substr($this->unpaddedKsn, ($m + $n));
+        $this->transactionCounter = "0" . substr($this->unpaddedKsn, -4);
     }
 
     /**
