@@ -1,8 +1,8 @@
 <?php
 
-require __DIR__ . '/../src/KeySerialNumber.php';
+require_once __DIR__ . '/../src/KeySerialNumber.php';
 
-class KeySerialNumberTest
+class KeySerialNumberTest extends PHPUnit_Framework_TestCase
 {
     public function testStripKsnGood()
     {
@@ -23,37 +23,18 @@ class KeySerialNumberTest
 
     public function testConstructor()
     {
-        $ksnDescriptor = "834";
         $ksn           = "0123456789321987";
-        $key           = new KeySerialNumber($ksn, $ksnDescriptor);
-        $this->assertEquals("01234567", $key->getBaseKeyId());
-        $this->assertEquals("8932", $key->getTrsmId());
-        $this->assertEquals("01987", $key->getTransactionCounter());
+        $key           = new KeySerialNumber($ksn);
+        $this->assertEquals("FFFF012345678920", $key->getBaseKeyId());
     }
 
+    public function testDeriveInitialKey() {
+        $bdk = '0123456789ABCDEFFEDCBA9876543210';
+        $ksn = 'FFFF9876543210E00000';
 
-    public function testKsnConstructingPlanned()
-    {
-        $termId  = "87654321";
-        $stan    = "246802";
-        $ksnStr  = $termId + "654" + $stan;
-        $ksnDesc = "803";
-        $ksn     = new KeySerialNumber($ksnStr, $ksnDesc);
+        $key = new KeySerialNumber($ksn);
+        $key->calculateIpek($bdk);
 
-        $this->assertEquals($termId, $ksn->getBaseKeyId());
-        $this->assertEquals("654", $ksn->getTrsmId());
-        $this->assertEquals("0" + $stan, $ksn->getTransactionCounter());
-    }
-
-
-    public function testPack()
-    {
-        $ksnDescriptor = "834";
-        $ksnStr        = "0123456789321987";
-        $ksn           = new KeySerialNumber($ksnStr, $ksnDescriptor);
-        $actual        = $ksn->pack();
-        $expected      = Utility::hex2bin($ksn->getPaddedKsn());
-
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals('6AC292FAA1315B4D858AB3A3D7D5933A', $key->getInitialKey());
     }
 }

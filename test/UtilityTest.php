@@ -69,16 +69,6 @@ class UtilityTest extends PHPUnit_Framework_TestCase
     }
 
 
-    public function testTripleDesEncrypt()
-    {
-        $bdk      = "0123456789ABCDEFFEDCBA9876543210";
-        $iKsn     = "012345E00000CDEF";
-        $actual   = Utility::tripleDesEncrypt($bdk, $iKsn);
-        $expected = "6A0749182F089E3F";
-        $this->assertEquals($expected, $actual);
-    }
-
-
     public function testXorHexString()
     {
         $input    = "0123456789ABCDEF";

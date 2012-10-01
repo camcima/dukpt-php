@@ -39,37 +39,22 @@ class Utility
      * @return ANDed result
      */
     public static function andHexStringOffset($input, $mask, $offset) {
-        $moddedInput = $input;
+        $binStr1 = self::hex2binstr($input);
+        $binStr2 = self::hex2binstr($mask);
 
-        if (strlen($input) % 2 == 1) {
-            $moddedInput = "0" . $input;
+        $binStr1 = str_pad($binStr1, max(strlen($binStr1), strlen($binStr2)), '0', STR_PAD_LEFT);
+        $binStr2 = str_pad($binStr2, max(strlen($binStr1), strlen($binStr2)), '0', STR_PAD_LEFT);
+
+        $binAnd = '';
+        for ($i = $offset; $i < strlen($binStr1); $i++) {
+            if (($binStr1[$i] == 1) && ($binStr2[$i] == 1)) {
+                $binAnd .= '1';
+            } else {
+                $binAnd .= '0';
+            }
         }
 
-        $data = self::hex2bin($moddedInput);
-
-        $moddedMask = $mask;
-
-        if (strlen($mask) % 2 == 1) {
-            $moddedMask = $mask . "F";
-        }
-
-        $maskData = self::hex2bin($moddedMask);
-
-        $os = $offset / 2;
-        $endPoint = $os + strlen($maskData);
-
-        for ($i = $os; $i < strlen($data) && $i < $endPoint; $i++) {
-            $a = $data[$i];
-            $b = $maskData[$i - $os];
-            $data[$i] = ($a & $b);
-        }
-
-        // The substring is to strip off the padded "0"
-        $len = strlen($input);
-
-        $encodedData = strtoupper(bin2hex($data));
-
-        return substr($encodedData, strlen($encodedData) - $len);
+        return self::binstr2hex($binAnd);
     }
 
     /**
@@ -82,41 +67,39 @@ class Utility
      * @return Encrypted data
      */
     public static function desEncrypt($key, $data) {
-        $ivSize = mcrypt_get_iv_size(MCRYPT_DES, MCRYPT_MODE_CBC);
-        $iv = mcrypt_create_iv($ivSize, MCRYPT_RAND);
-        $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_CBC, $iv);
+        $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_ECB);
         return strtoupper(bin2hex($encryptedData));
     }
 
     /**
-     * Convert two hex strings to byte[] and OR them from the offset
+     * Convert two hex strings to byte[] and OR them from the binary offset
      *
      * @param input
      *            First string
      * @param mask
      *            Second string
      * @param offset
-     *            Offset
+     *            Binary Offset
      * @return ORed result
      */
-    public static function orHexStringOffset($input, $mask, $offset)
+    public static function orHexStringOffset($input, $mask, $offset = 0)
     {
-        if (strlen($mask) % 2 == 1) {
-            $mask = "0" . $mask;
+        $binStr1 = self::hex2binstr($input);
+        $binStr2 = self::hex2binstr($mask);
+
+        $binStr1 = str_pad($binStr1, max(strlen($binStr1), strlen($binStr2)), '0', STR_PAD_LEFT);
+        $binStr2 = str_pad($binStr2, max(strlen($binStr1), strlen($binStr2)), '0', STR_PAD_LEFT);
+
+        $binOr = substr($binStr1, 0, $offset);
+        for ($i = $offset; $i < strlen($binStr1); $i++) {
+            if (($binStr1[$i] == 1) || ($binStr2[$i] == 1)) {
+                $binOr .= '1';
+            } else {
+                $binOr .= '0';
+            }
         }
 
-        $data = self::hex2bin($input);
-        $maskData = self::hex2bin($mask);
-        $os = $offset / 2;
-        $endPoint = $os + strlen($maskData);
-
-        for ($i = $os; $i < strlen($data) && $i < $endPoint; $i++) {
-            $a = $data[$i];
-            $b = $maskData[$i - $os];
-            $data[$i] = ($a | $b);
-        }
-
-        return strtoupper(bin2hex($data));
+        return self::binstr2hex($binOr);
     }
 
     /**
@@ -150,23 +133,6 @@ class Utility
     }
 
     /**
-     * 3DES Encrypt the data
-     *
-     * @param key
-     *            Key to encrypt with
-     * @param data
-     *            Data to be encrypted
-     * @return Hex string of encrypted data
-     */
-    public static function tripleDesEncrypt($key, $data)
-    {
-        $ivSize = mcrypt_get_iv_size(MCRYPT_3DES, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($ivSize);
-        $encryptedData = mcrypt_encrypt(MCRYPT_3DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_ECB, $iv);
-        return strtoupper(bin2hex($encryptedData));
-    }
-
-    /**
      * Convert two hex strings to byte[] and XOR them
      *
      * @param input
@@ -176,10 +142,59 @@ class Utility
      * @return XORed result
      */
     public static function xorHexString($input, $mask) {
-        $data = self::hex2bin($input);
-        $maskData = self::hex2bin($mask);
+        $binStr1 = self::hex2binstr($input);
+        $binStr2 = self::hex2binstr($mask);
 
-        $result = $data ^ $maskData;
-        return strtoupper(bin2hex($result));
+        $binXor = '';
+        for ($i = 0; $i < strlen($binStr1); $i++) {
+            if ($binStr1[$i] == $binStr2[$i]) {
+                $binXor .= '0';
+            } else {
+                $binXor .= '1';
+            }
+        }
+
+        return self::binstr2hex($binXor);
+    }
+
+    public static function hex2binstr($hexInput) {
+        if (strlen($hexInput) % 2 == 1) {
+            $hexInput = '0' . $hexInput;
+        }
+
+        $binstr = '';
+        for ($i = 0; $i < strlen($hexInput); $i = $i + 2) {
+            $hex = substr($hexInput, $i, 2);
+
+            $binstr .= str_pad(decbin(hexdec($hex)), 8, '0', STR_PAD_LEFT);
+        }
+
+        return $binstr;
+    }
+
+    public static function binstr2hex($binstrInput) {
+
+        $paddedBinstrInput = str_pad($binstrInput, ceil(strlen($binstrInput)/ 8) * 8, '0', STR_PAD_LEFT);
+
+        $hex = '';
+        for ($i = strlen($paddedBinstrInput); $i > 0; $i = $i - 8) {
+            $binstr = substr($paddedBinstrInput, $i - 8, 8);
+            $hex = str_pad(dechex(bindec($binstr)), 2, '0', STR_PAD_LEFT) . $hex;
+        }
+
+        return strtoupper($hex);
+    }
+
+
+    public static function encrypt_3des_ede($hexData, $hexKey) {
+        $k1 = substr($hexKey, 0, 16);
+        $k2 = substr($hexKey, 16);
+        $k3 = $k1;
+
+        $k1enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k1), self::hex2bin($hexData), MCRYPT_MODE_ECB);
+        $k2dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k2), $k1enc, MCRYPT_MODE_ECB);
+        $k3enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k3), $k2dec, MCRYPT_MODE_ECB);
+
+        return $k3enc;
     }
 }

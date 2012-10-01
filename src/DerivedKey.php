@@ -11,7 +11,7 @@ class DerivedKey
 
     /**
      * Calculate the derived key from the KSN and BDK
-     * 
+     *
      * @param ksn
      *            Key Serial Number
      * @param bdk
@@ -20,20 +20,12 @@ class DerivedKey
      */
     public static function calculateDerivedKey(KeySerialNumber $ksn, $bdk)
     {
-        // Copy IPEK into CURKEY
-        $curKey = self::calculateIpek($ksn, $bdk);
+        $ksn->calculateIpek($bdk);
+        $curKey = $ksn->getInitialKey();
 
-        // R8 is Register 8
-        // Copy KSNR into R8
-        $unpaddedKsn = $ksn->getUnpaddedKsn();
-        $r8 = substr($unpaddedKsn, -16);
+        $r8 = $ksn->getBaseKeyId();
 
-        // Clear the 21 right most bits of R8
-        $r8 = Utility::andHexStringOffset($r8, self::_E00000, strlen($r8) - 6);
-
-        // R3 is Register 3
-        // Copy the 21 right-most bits of KSNR into R3
-        $r3 = Utility::andHexStringOffset($ksn->getTransactionCounter(), self::_1FFFFF, 0);
+        $r3 = $ksn->getTransactionCounter();
 
         $shiftr = self::_100000;
 
@@ -45,20 +37,22 @@ class DerivedKey
 
         while ($shiftr > 0) {
             $temp = Utility::andHexString($shiftr, $r3);
+
             if ($temp != 0) {
-                $r8 = Utility::orHexStringOffset($r8, $shiftr, strlen($r8) - 6);
-                $r8a = Utility::xorHexString($r8, substr($curKey, 16, 32));
-                $r8a = Utility::desEncrypt(substr($curKey, 0, 16), $r8a);
-                $r8a = Utility::xorHexString($r8a, substr($curKey, 16, 32));
+                $r8 = Utility::orHexStringOffset($r8, $shiftr, 59);
+                $r8a = Utility::xorHexString($r8, self::rightHalf($curKey));
+                $r8a = Utility::desEncrypt(self::leftHalf($curKey), $r8a);
+                $r8a = Utility::xorHexString($r8a, self::rightHalf($curKey));
 
                 $curKey = Utility::xorHexString($curKey, "C0C0C0C000000000C0C0C0C000000000");
 
-                $r8b = Utility::xorHexString(substr($curKey, 16, 32), $r8);
-                $r8b = Utility::desEncrypt(substr($curKey, 0, 16), $r8b);
-                $r8b = Utility::xorHexString($r8b, substr($curKey, 16, 32));
+                $r8b = Utility::xorHexString(self::rightHalf($curKey), $r8);
+                $r8b = Utility::desEncrypt(self::leftHalf($curKey), $r8b);
+                $r8b = Utility::xorHexString(self::rightHalf($curKey), $r8b);
 
                 $curKey = $r8b . $r8a;
             }
+
             $shiftr = Utility::shiftRightHexString($shiftr);
         }
 
@@ -67,38 +61,12 @@ class DerivedKey
         return $curKey;
     }
 
-    /**
-     * Calculate the Initial Pin Encryption Key from the current KSN
-     * 
-     * @param ksn
-     *            Key Serial Number
-     * @param bdk
-     *            Base Derivation Key
-     * @return IPEK
-     */
-    public static function calculateIpek(KeySerialNumber $ksn, $bdk)
-    {
-        $iKsn = substr(Utility::andHexStringOffset($ksn->getPaddedKsn(), "E00000", 14), 0, 16);
-        $ipek = self::calculateIpekFromInitialKsn($iKsn, $bdk);
-        $ksn->setInitialKey($ipek);
-        return $ipek;
+    private static function leftHalf($key) {
+        return substr($key, 0, 16);
     }
 
-    /**
-     * Calculate the Initial Pin Encryption Key from the initial KSN
-     * 
-     * @param iKsn
-     *            Initial Key Serial Number
-     * @param bdk
-     *            Base Derivation Key
-     * @return IPEK
-     */
-    public static function calculateIpekFromInitialKsn($iKsn, $bdk)
-    {
-        $ipek = Utility::tripleDesEncrypt($bdk, $iKsn);
-        $xorBdk = Utility::xorHexString($bdk, "C0C0C0C000000000C0C0C0C000000000");
-        $ipek = $ipek . Utility::tripleDesEncrypt($xorBdk, $iKsn);
-        return $ipek;
+    private static function rightHalf($key) {
+        return substr($key, 16);
     }
 
 }

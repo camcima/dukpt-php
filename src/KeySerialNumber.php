@@ -1,10 +1,15 @@
 <?php
 
+require_once __DIR__ . '/../src/Utility.php';
+
 class KeySerialNumber
 {
-    private $baseKeyId;
+    private $issuerIdentifierNumber;
+    private $customerId;
+    private $groupId;
     private $trsmId;
     private $transactionCounter;
+    private $baseKeyId;
     private $paddedKsn;
     private $unpaddedKsn;
     private $initialKey;
@@ -14,30 +19,28 @@ class KeySerialNumber
      *
      * @param $ksn
      *            Key Serial Number to initialise with
-     * @param $ksnDescriptor
-     *            KSN descriptor
      */
-    public function __construct($ksn, $ksnDescriptor)
+    public function __construct($ksn)
     {
-        $this->paddedKsn = $ksn;
-        $this->unpaddedKsn = stripKsn($ksn);
+        if (strlen($ksn) == 20) {
+            $this->paddedKsn = $ksn;
+            $this->unpaddedKsn = self::stripKsn($ksn);
+        } elseif (strlen($ksn) == 16) {
+            $this->unpaddedKsn = $ksn;
+            $this->paddedKsn = 'FFFF' . $ksn;
+        }
 
-        // The base key ID is the first n chars of the unpadded KSN. n is determined by the first two positions $ksn
-        // descriptor
-        $n = (int) substr($ksnDescriptor, 0, 1);
-        $this->baseKeyId = substr($this->unpaddedKsn, 0, $n);
+        $this->issuerIdentifierNumber = substr($ksn, 0, 6);
+        $this->customerId = substr($ksn, 6, 2);
+        $this->groupId = substr($ksn, 8, 2);
 
-        // The TRSM ID is the following m chars of the unpadded $ksn. m is determined by the last position in the $ksn
-        // descriptor
-        $m = (int) (substr($ksnDescriptor, 2, 3));
-        $this->trsmId = substr($this->unpaddedKsn, $n, $n + $m);
+        $binStr = str_pad(Utility::hex2binstr(substr($ksn, 10)), 40, '0', STR_PAD_LEFT);
 
-        // The transaction counter is a mystery to me. I don't know what on earth this code does, but I want to
-        $huh = $this->unpaddedKsn[($m + $n - 1)];
-        $surepal = ord($huh);
-        $surepal = $surepal & 1;
-        $iReallyDontUnderstandThis = chr($surepal);
-        $this->transactionCounter = $iReallyDontUnderstandThis + substr($this->unpaddedKsn, (m + n));
+        $this->trsmId = Utility::binstr2hex(substr($binStr, 0, 19));
+        $this->transactionCounter = Utility::binstr2hex(substr($binStr, 19));
+
+        $binBaseKey = substr(Utility::hex2binstr($this->paddedKsn), 0, 59) . str_repeat('0', 21);
+        $this->baseKeyId = substr(Utility::binstr2hex($binBaseKey), 0, 16);
     }
 
     /**
@@ -94,5 +97,14 @@ class KeySerialNumber
     public function pack()
     {
         return Utility::hex2bin($this->paddedKsn);
+    }
+
+    public function calculateIpek($bdk) {
+        $coco = 'c0c0c0c000000000c0c0c0c000000000';
+
+        $leftInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, $bdk));
+        $rightInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, Utility::xorHexString($bdk, $coco)));
+
+        $this->initialKey = strtoupper($leftInitialKey . $rightInitialKey);
     }
 }
