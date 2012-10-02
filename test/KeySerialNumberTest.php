@@ -38,15 +38,4 @@ class KeySerialNumberTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('6AC292FAA1315B4D858AB3A3D7D5933A', $ksnObj->getInitialKey());
     }
 
-    public function testDeriveFirstKey()
-    {
-        $bdk = '0123456789ABCDEFFEDCBA9876543210';
-        $ksn = 'FFFF9876543210E00001';
-
-        $ksnObj = new KeySerialNumber($ksn);
-        $key = DerivedKey::calculateDerivedKey($ksnObj, $bdk);
-
-        $this->assertEquals('448D3F076D8304036A55A3D7E0055A78', $key);
-    }
-
 }

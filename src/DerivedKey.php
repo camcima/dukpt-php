@@ -24,7 +24,7 @@ class DerivedKey
         $curKey = $ksn->getInitialKey();
 
         $ksnr = $ksn->getKsnr();
-        $r8 = Utility::binstr2hex(substr(Utility::hex2binstr($ksnr), 0, 43) . str_repeat('0', 21));
+        $r8 = Utility::binstr2hex(substr(Utility::hex2binstr($ksnr), 0, 43) . str_repeat('0', 2));
 
         $r3 = $ksn->getTransactionCounter();
 
@@ -50,8 +50,6 @@ class DerivedKey
 
             $shiftr = Utility::shiftRightHexString($shiftr);
         }
-
-        $curKey = Utility::xorHexString($curKey, "00000000000000FF00000000000000FF");
 
         return $curKey;
     }

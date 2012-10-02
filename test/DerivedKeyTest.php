@@ -6,6 +6,28 @@ require_once __DIR__ . '/../src/KeySerialNumber.php';
 class DerivedKeyTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testDeriveFirstKey()
+    {
+        $bdk = '0123456789ABCDEFFEDCBA9876543210';
+        $ksn = 'FFFF9876543210E00001';
+
+        $ksnObj = new KeySerialNumber($ksn);
+        $key = DerivedKey::calculateDerivedKey($ksnObj, $bdk);
+
+        $this->assertEquals('448D3F076D8304036A55A3D7E0055A78', $key);
+    }
+
+    public function testDeriveSecondKey()
+    {
+        $bdk = '0123456789ABCDEFFEDCBA9876543210';
+        $ksn = 'FFFF9876543210E00002';
+
+        $ksnObj = new KeySerialNumber($ksn);
+        $key = DerivedKey::calculateDerivedKey($ksnObj, $bdk);
+
+        $this->assertEquals('448D3F076D8304036A55A3D7E0055A78', $key);
+    }
+    
     public function testCalculateDerivedKey()
     {
         $ksn = "FFFF9876543210E00001";
@@ -22,8 +44,7 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $ksn = '62994901190000000002';
         $bdk = '0123456789ABCDEFFEDCBA9876543210';
         
-        $ksnDescriptor = "834";
-        $key = new KeySerialNumber($ksn, $ksnDescriptor);
+        $key = new KeySerialNumber($ksn);
         $derivedKey = DerivedKey::calculateDerivedKey($key, $bdk);
         
         $this->assertEquals('1A994C3E09D9ACEF3EA9BD4381EFA334', $derivedKey);
