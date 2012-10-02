@@ -1,5 +1,7 @@
 <?php
 
+include_once('Crypt/TripleDES.php');
+
 class Utility
 {
     public static function hex2bin($h)
@@ -167,27 +169,26 @@ class Utility
 
     public static function tripleDesEncrypt($hexData, $hexKey)
     {
-        $k1 = substr($hexKey, 0, 16);
-        $k2 = substr($hexKey, 16);
-        $k3 = $k1;
+        //fix Crypt Library padding
+        $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $k1enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k1), self::hex2bin($hexData), MCRYPT_MODE_ECB);
-        $k2dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k2), $k1enc, MCRYPT_MODE_ECB);
-        $k3enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k3), $k2dec, MCRYPT_MODE_ECB);
+        $crypt3DES = new Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES->setKey(Utility::hex2bin($hexKey));
+        $crypt3DES->disablePadding();
 
-        return strtoupper(bin2hex($k3enc));
+        return strtoupper(bin2hex($crypt3DES->encrypt(Utility::hex2bin($hexData))));
     }
 
     public static function tripleDesDecrypt($hexData, $hexKey)
     {
-        $k1 = substr($hexKey, 0, 16);
-        $k2 = substr($hexKey, 16);
-        $k3 = $k1;
+        //fix Crypt Library padding
+        $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $k1dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k1), self::hex2bin($hexData), MCRYPT_MODE_ECB);
-        $k2enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k2), $k1dec, MCRYPT_MODE_ECB);
-        $k3dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k3), $k2enc, MCRYPT_MODE_ECB);
+        $crypt3DES = new Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES->setKey(Utility::hex2bin($hexKey));
+        $crypt3DES->disablePadding();
 
-        return strtoupper(bin2hex($k3dec));
+        return strtoupper(bin2hex($crypt3DES->decrypt(Utility::hex2bin($hexData))));
     }
+
 }

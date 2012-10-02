@@ -23,4 +23,16 @@ class KeySerialNumberTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('6AC292FAA1315B4D858AB3A3D7D5933A', $ksnObj->getInitialKey());
     }
 
+    public function testDeriveInitialKeyForReal()
+    {
+        $bdk = '0123456789ABCDEFFEDCBA9876543210';
+        $ksn = '62994901190000000002';
+
+        $ksnObj = new KeySerialNumber($ksn);
+        $ksnObj->calculateIpek($bdk);
+
+        $this->assertEquals('18126D59ECFEF71D4D982B52DC7F15BA', $ksnObj->getInitialKey());
+    }
+
+    
 }
