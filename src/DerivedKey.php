@@ -86,10 +86,10 @@ class DerivedKey
         $variantKeyLeft = self::leftHalf($variantKey);
         $variantKeyRight = self::rightHalf($variantKey);
 
-        $encryptionKeyLeft = Utility::encrypt_3des_ede($variantKeyLeft, $variantKey);
-        $encryptionKeyRight = Utility::encrypt_3des_ede($variantKeyRight, $variantKey);
+        $encryptionKeyLeft = Utility::tripleDesEncrypt($variantKeyLeft, $variantKey);
+        $encryptionKeyRight = Utility::tripleDesEncrypt($variantKeyRight, $variantKey);
 
-        $result = strtoupper(bin2hex($encryptionKeyLeft . $encryptionKeyRight));
+        $result = $encryptionKeyLeft . $encryptionKeyRight;
 
         return $result;
     }
@@ -102,10 +102,10 @@ class DerivedKey
         $variantKeyLeft = self::leftHalf($variantKey);
         $variantKeyRight = self::rightHalf($variantKey);
 
-        $encryptionKeyLeft = Utility::encrypt_3des_ede($variantKeyLeft, $variantKey);
-        $encryptionKeyRight = Utility::encrypt_3des_ede($variantKeyRight, $variantKey);
+        $encryptionKeyLeft = Utility::tripleDesEncrypt($variantKeyLeft, $variantKey);
+        $encryptionKeyRight = Utility::tripleDesEncrypt($variantKeyRight, $variantKey);
 
-        $result = strtoupper(bin2hex($encryptionKeyLeft . $encryptionKeyRight));
+        $result = $encryptionKeyLeft . $encryptionKeyRight;
 
         return $result;
     }

@@ -165,7 +165,7 @@ class Utility
         return strtoupper(bin2hex($encryptedData));
     }
 
-    public static function encrypt_3des_ede($hexData, $hexKey)
+    public static function tripleDesEncrypt($hexData, $hexKey)
     {
         $k1 = substr($hexKey, 0, 16);
         $k2 = substr($hexKey, 16);
@@ -175,7 +175,19 @@ class Utility
         $k2dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k2), $k1enc, MCRYPT_MODE_ECB);
         $k3enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k3), $k2dec, MCRYPT_MODE_ECB);
 
-        return $k3enc;
+        return strtoupper(bin2hex($k3enc));
     }
 
+    public static function tripleDesDecrypt($hexData, $hexKey)
+    {
+        $k1 = substr($hexKey, 0, 16);
+        $k2 = substr($hexKey, 16);
+        $k3 = $k1;
+
+        $k1dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k1), self::hex2bin($hexData), MCRYPT_MODE_ECB);
+        $k2enc = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($k2), $k1dec, MCRYPT_MODE_ECB);
+        $k3dec = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($k3), $k2enc, MCRYPT_MODE_ECB);
+
+        return strtoupper(bin2hex($k3dec));
+    }
 }

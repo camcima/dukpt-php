@@ -77,4 +77,14 @@ class UtilityTest extends PHPUnit_Framework_TestCase
         $actual   = Utility::xorHexString($input, $mask);
         $this->assertEquals($expected, $actual);
     }
+    
+    public function testTripleDesEncryptDecrypt() {
+        $key = '0123456789ABCDEFFEDCBA9876543210';
+        $data = '0123456789ABCDEF';
+        
+        $expected = $data;
+        $actual = Utility::tripleDesDecrypt(Utility::tripleDesEncrypt($data, $key), $key);
+        
+        $this->assertEquals($expected, $actual);
+    }
 }

@@ -97,10 +97,10 @@ class KeySerialNumber
 
     public function calculateIpek($bdk)
     {
-        $leftInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, $bdk));
-        $rightInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, Utility::xorHexString($bdk, self::_C0C0)));
+        $leftInitialKey = Utility::tripleDesEncrypt($this->baseKeyId, $bdk);
+        $rightInitialKey = Utility::tripleDesEncrypt($this->baseKeyId, Utility::xorHexString($bdk, self::_C0C0));
 
-        $this->initialKey = strtoupper($leftInitialKey . $rightInitialKey);
+        $this->initialKey = $leftInitialKey . $rightInitialKey;
     }
 
 }

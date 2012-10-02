@@ -5,7 +5,6 @@ require_once __DIR__ . '/../src/KeySerialNumber.php';
 
 class DerivedKeyTest extends PHPUnit_Framework_TestCase
 {
-
     public function testDeriveFirstKey()
     {
         $bdk = '0123456789ABCDEFFEDCBA9876543210';
@@ -61,15 +60,30 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('D9AE3E62F5E3CA2C357E37F500D9F314', $key);
     }
 
-    public function testCalculateDerivedKeyForReal() {
-        $encryptedData = Utility::hex2bin('DA7F2A52BD3F6DD8B96C50FC39C7E6AF22F06ED1F033BE0FB23D6BD33DC5A1F808512F7AE18D47A60CC3F4559B1B093563BE7E07459072ABF8FAAB5338C6CC8815FF87797AE3A7BE');
+    public function testCalculateEncryptionKeyForReal()
+    {
         $ksn = '62994901190000000002';
         $bdk = '0123456789ABCDEFFEDCBA9876543210';
 
         $key = new KeySerialNumber($ksn);
-        $derivedKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
+        $encryptionKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
 
-        $this->assertEquals('1A994C3E09D9ACEF3EA9BD4381EFA334', $derivedKey);
+        $this->assertEquals('1A994C3E09D9ACEF3EA9BD4381EFA334', $encryptionKey);
+    }
+
+    public function testDecryptDukptMessage()
+    {
+        $encryptedHexData = 'DA7F2A52BD3F6DD8B96C50FC39C7E6AF22F06ED1F033BE0FB23D6BD33DC5A1F808512F7AE18D47A60CC3F4559B1B093563BE7E07459072ABF8FAAB5338C6CC8815FF87797AE3A7BE';
+        $ksn = '62994901190000000002';
+        $bdk = '0123456789ABCDEFFEDCBA9876543210';
+
+        $key = new KeySerialNumber($ksn);
+        $encryptionKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
+        $actual = Utility::hex2bin(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey));
+        var_dump($actual);
+        $expected = '';
+
+        $this->assertEquals($expected, $actual);
     }
 
 }
