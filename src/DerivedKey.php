@@ -24,7 +24,7 @@ class DerivedKey
         $curKey = $ksn->getInitialKey();
 
         $ksnr = $ksn->getKsnr();
-        $r8 = Utility::binstr2hex(substr(Utility::hex2binstr($ksnr), 0, 43) . str_repeat('0', 2));
+        $r8 = Utility::binstr2hex(substr(Utility::hex2binstr($ksnr), 0, 43) . str_repeat('0', 21));
 
         $r3 = $ksn->getTransactionCounter();
 
@@ -52,6 +52,28 @@ class DerivedKey
         }
 
         return $curKey;
+    }
+
+    public static function calculateVariantKey($derivedKey)
+    {
+        $result = Utility::xorHexString($derivedKey, '0000000000FF00000000000000FF0000');
+        return $result;
+    }
+
+    public static function calculateEncryptionKey(KeySerialNumber $ksn, $bdk)
+    {
+        $derivedKey = self::calculateDerivedKey($ksn, $bdk);
+        $variantKey = self::calculateVariantKey($derivedKey);
+
+        $variantKeyLeft = self::leftHalf($variantKey);
+        $variantKeyRight = self::rightHalf($variantKey);
+
+        $encryptionKeyLeft = Utility::encrypt_3des_ede($variantKeyLeft, $variantKey);
+        $encryptionKeyRight = Utility::encrypt_3des_ede($variantKeyRight, $variantKey);
+
+        $result = strtoupper(bin2hex($encryptionKeyLeft . $encryptionKeyRight));
+
+        return $result;
     }
 
     private static function leftHalf($key) {
