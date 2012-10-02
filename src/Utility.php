@@ -159,7 +159,7 @@ class Utility
         return dechex(bindec($result));
     }
 
-    public static function desEncrypt($key, $data)
+    public static function desEncrypt($data, $key)
     {
         $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_ECB);
         return strtoupper(bin2hex($encryptedData));

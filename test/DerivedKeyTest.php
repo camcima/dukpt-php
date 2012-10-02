@@ -80,7 +80,6 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $key = new KeySerialNumber($ksn);
         $encryptionKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
         $actual = Utility::hex2bin(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey));
-        var_dump($actual);
         $expected = '';
 
         $this->assertEquals($expected, $actual);

@@ -30,13 +30,13 @@ class DerivedKey
             if ($temp != 0) {
                 $r8 = Utility::orHexStringOffset($r8, $shiftr, 59);
                 $r8a = Utility::xorHexString($r8, self::rightHalf($curKey));
-                $r8a = Utility::desEncrypt(self::leftHalf($curKey), $r8a);
+                $r8a = Utility::desEncrypt($r8a, self::leftHalf($curKey));
                 $r8a = Utility::xorHexString($r8a, self::rightHalf($curKey));
 
                 $curKey = Utility::xorHexString($curKey, "C0C0C0C000000000C0C0C0C000000000");
 
                 $r8b = Utility::xorHexString(self::rightHalf($curKey), $r8);
-                $r8b = Utility::desEncrypt(self::leftHalf($curKey), $r8b);
+                $r8b = Utility::desEncrypt($r8b, self::leftHalf($curKey));
                 $r8b = Utility::xorHexString(self::rightHalf($curKey), $r8b);
 
                 $curKey = $r8b . $r8a;

@@ -45,7 +45,7 @@ class UtilityTest extends PHPUnit_Framework_TestCase
         $key      = "0123456789ABCDEF";
         $data     = "0000000000000000";
         $expected = "D5D44FF720683D0D";
-        $actual   = Utility::desEncrypt($key, $data);
+        $actual   = Utility::desEncrypt($data, $key);
         $this->assertEquals($expected, $actual);
     }
 
