@@ -13,6 +13,7 @@ class KeySerialNumber
     private $paddedKsn;
     private $unpaddedKsn;
     private $initialKey;
+    private $ksnr;
 
     /**
      * Create a new instance of the KeySerialNumber class
@@ -33,6 +34,7 @@ class KeySerialNumber
         $this->issuerIdentifierNumber = substr($ksn, 0, 6);
         $this->customerId = substr($ksn, 6, 2);
         $this->groupId = substr($ksn, 8, 2);
+        $this->ksnr = substr($this->paddedKsn, -16);
 
         $binStr = str_pad(Utility::hex2binstr(substr($ksn, 10)), 40, '0', STR_PAD_LEFT);
 
@@ -89,6 +91,10 @@ class KeySerialNumber
         return $this->unpaddedKsn;
     }
 
+    public function getKsnr() {
+        return $this->ksnr;
+    }
+    
     public function setInitialKey($initialKey)
     {
         $this->initialKey = $initialKey;

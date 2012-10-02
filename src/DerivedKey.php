@@ -23,17 +23,12 @@ class DerivedKey
         $ksn->calculateIpek($bdk);
         $curKey = $ksn->getInitialKey();
 
-        $r8 = $ksn->getBaseKeyId();
+        $ksnr = $ksn->getKsnr();
+        $r8 = Utility::binstr2hex(substr(Utility::hex2binstr($ksnr), 0, 43) . str_repeat('0', 21));
 
         $r3 = $ksn->getTransactionCounter();
 
         $shiftr = self::_100000;
-
-
-        // WARNING: Here be MAGIC. I got this code from the Thales Simulator
-        // http://thalessim.codeplex.com project and I don't understand it.
-        // Have a look at https://bitbucket.org/joxley/crypto-utils for a description of how I think DUKPT works. If you
-        // know better, please tell me <john.oxley@gmail.com>
 
         while ($shiftr > 0) {
             $temp = Utility::andHexString($shiftr, $r3);
