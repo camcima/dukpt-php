@@ -34,7 +34,7 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $ksn = 'FFFF9876543210E00001';
 
         $ksnObj = new KeySerialNumber($ksn);
-        $key = DerivedKey::calculateEncryptionKey($ksnObj, $bdk);
+        $key = DerivedKey::calculateDataEncryptionRequestKey($ksnObj, $bdk);
 
         $this->assertEquals('448D3F076D8304036A55A3D7E0055A78', $key);
     }
@@ -45,7 +45,7 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $ksn = 'FFFF9876543210E00002';
 
         $ksnObj = new KeySerialNumber($ksn);
-        $key = DerivedKey::calculateEncryptionKey($ksnObj, $bdk);
+        $key = DerivedKey::calculateDataEncryptionRequestKey($ksnObj, $bdk);
 
         $this->assertEquals('F1BE73B36135C5C26CF937D50ABBE5AF', $key);
     }
@@ -56,7 +56,7 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $ksn = 'FFFF9876543210E00015';
 
         $ksnObj = new KeySerialNumber($ksn);
-        $key = DerivedKey::calculateEncryptionKey($ksnObj, $bdk);
+        $key = DerivedKey::calculateDataEncryptionRequestKey($ksnObj, $bdk);
 
         $this->assertEquals('D9AE3E62F5E3CA2C357E37F500D9F314', $key);
     }
@@ -67,7 +67,7 @@ class DerivedKeyTest extends PHPUnit_Framework_TestCase
         $bdk = '0123456789ABCDEFFEDCBA9876543210';
 
         $key = new KeySerialNumber($ksn);
-        $derivedKey = DerivedKey::calculateEncryptionKey($key, $bdk);
+        $derivedKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
 
         $this->assertEquals('1A994C3E09D9ACEF3EA9BD4381EFA334', $derivedKey);
     }

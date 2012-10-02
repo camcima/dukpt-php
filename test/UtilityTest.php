@@ -6,8 +6,8 @@ class UtilityTest extends PHPUnit_Framework_TestCase
 {
     public function testAndHexStringOffset()
     {
-        $actual   = Utility::andHexStringOffset("012345F789ABCDEF", "E00000", 6);
-        $expected = "012345E00000CDEF";
+        $actual   = Utility::andHexStringOffset("012345F789ABCDEF", "E00000", 40);
+        $expected = "012345F789A00000";
         $this->assertEquals($expected, $actual);
     }
 
@@ -23,7 +23,7 @@ class UtilityTest extends PHPUnit_Framework_TestCase
     public function testAndHexStringReg3()
     {
         $input    = "010000";
-        $mask     = "01987";
+        $mask     = "019870";
         $actual   = Utility::andHexString($input, $mask);
         $expected = "010000";
         $this->assertEquals($expected, $actual);
@@ -33,7 +33,7 @@ class UtilityTest extends PHPUnit_Framework_TestCase
     public function testAndHexStringShiftTemp()
     {
         $input    = "000008";
-        $mask     = "01987";
+        $mask     = "01988";
         $actual   = Utility::andHexString($input, $mask);
         $expected = "000008";
         $this->assertEquals($expected, $actual);

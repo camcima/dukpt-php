@@ -5,21 +5,6 @@ require_once __DIR__ . '/../src/DerivedKey.php';
 
 class KeySerialNumberTest extends PHPUnit_Framework_TestCase
 {
-    public function testStripKsnGood()
-    {
-        $ksn = "FFFF123456789";
-        $expected = "123456789";
-        $actual = KeySerialNumber::stripKsn($ksn);
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testStripKsnNoPadding()
-    {
-        $ksn = "FFF1234567890";
-        $actual = KeySerialNumber::stripKsn($ksn);
-        $this->assertEquals($ksn, $actual);
-    }
-
     public function testConstructor()
     {
         $ksn = "0123456789321987";

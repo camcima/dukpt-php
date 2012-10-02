@@ -4,6 +4,8 @@ require_once __DIR__ . '/../src/Utility.php';
 
 class KeySerialNumber
 {
+    const _C0C0 = 'c0c0c0c000000000c0c0c0c000000000';
+
     private $issuerIdentifierNumber;
     private $customerId;
     private $groupId;
@@ -15,17 +17,11 @@ class KeySerialNumber
     private $initialKey;
     private $ksnr;
 
-    /**
-     * Create a new instance of the KeySerialNumber class
-     *
-     * @param $ksn
-     *            Key Serial Number to initialise with
-     */
     public function __construct($ksn)
     {
         if (strlen($ksn) == 20) {
             $this->paddedKsn = $ksn;
-            $this->unpaddedKsn = self::stripKsn($ksn);
+            $this->unpaddedKsn = $this->stripKsn($ksn);
         } elseif (strlen($ksn) == 16) {
             $this->unpaddedKsn = $ksn;
             $this->paddedKsn = 'FFFF' . $ksn;
@@ -45,14 +41,7 @@ class KeySerialNumber
         $this->baseKeyId = substr(Utility::binstr2hex($binBaseKey), 0, 16);
     }
 
-    /**
-     * Strips the padding off the KSN
-     *
-     * @param $ksn Padded KSN
-     *
-     * @return Unpadded KSN
-     */
-    public static function stripKsn($ksn)
+    public function stripKsn($ksn)
     {
         if (strpos($ksn, 'FFFF') === 0) {
             return substr($ksn, 4);
@@ -91,10 +80,11 @@ class KeySerialNumber
         return $this->unpaddedKsn;
     }
 
-    public function getKsnr() {
+    public function getKsnr()
+    {
         return $this->ksnr;
     }
-    
+
     public function setInitialKey($initialKey)
     {
         $this->initialKey = $initialKey;
@@ -105,12 +95,12 @@ class KeySerialNumber
         return Utility::hex2bin($this->paddedKsn);
     }
 
-    public function calculateIpek($bdk) {
-        $coco = 'c0c0c0c000000000c0c0c0c000000000';
-
+    public function calculateIpek($bdk)
+    {
         $leftInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, $bdk));
-        $rightInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, Utility::xorHexString($bdk, $coco)));
+        $rightInitialKey = bin2hex(Utility::encrypt_3des_ede($this->baseKeyId, Utility::xorHexString($bdk, self::_C0C0)));
 
         $this->initialKey = strtoupper($leftInitialKey . $rightInitialKey);
     }
+
 }

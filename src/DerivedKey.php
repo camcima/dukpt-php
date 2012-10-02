@@ -5,19 +5,13 @@ require_once __DIR__ . '/../src/KeySerialNumber.php';
 
 class DerivedKey
 {
-    const _1FFFFF = "1FFFFF";
     const _100000 = "100000";
-    const _E00000 = "E00000";
+    const VARIANT_CONSTANT_PIN_ENCRYPTION = "00000000000000FF00000000000000FF";
+    const VARIANT_CONSTANT_MAC_REQUEST    = "000000000000FF00000000000000FF00";
+    const VARIANT_CONSTANT_MAC_RESPONSE   = "00000000FF00000000000000FF000000";
+    const VARIANT_CONSTANT_DATA_REQUEST   = "0000000000FF00000000000000FF0000";
+    const VARIANT_CONSTANT_DATA_RESPONSE  = "000000FF00000000000000FF00000000";
 
-    /**
-     * Calculate the derived key from the KSN and BDK
-     *
-     * @param ksn
-     *            Key Serial Number
-     * @param bdk
-     *            Base Derivation Key
-     * @return Derived Key
-     */
     public static function calculateDerivedKey(KeySerialNumber $ksn, $bdk)
     {
         $ksn->calculateIpek($bdk);
@@ -54,16 +48,40 @@ class DerivedKey
         return $curKey;
     }
 
-    public static function calculateVariantKey($derivedKey)
+    public static function calculateVariantKey($derivedKey, $variantConstant)
     {
-        $result = Utility::xorHexString($derivedKey, '0000000000FF00000000000000FF0000');
+        $result = Utility::xorHexString($derivedKey, $variantConstant);
         return $result;
     }
 
-    public static function calculateEncryptionKey(KeySerialNumber $ksn, $bdk)
+    public static function calculatePinEncryptionKey(KeySerialNumber $ksn, $bdk)
     {
         $derivedKey = self::calculateDerivedKey($ksn, $bdk);
-        $variantKey = self::calculateVariantKey($derivedKey);
+        $variantKey = self::calculateVariantKey($derivedKey, self::VARIANT_CONSTANT_PIN_ENCRYPTION);
+
+        return $variantKey;
+    }
+
+    public static function calculateMacRequestKey(KeySerialNumber $ksn, $bdk)
+    {
+        $derivedKey = self::calculateDerivedKey($ksn, $bdk);
+        $variantKey = self::calculateVariantKey($derivedKey, self::VARIANT_CONSTANT_MAC_REQUEST);
+
+        return $variantKey;
+    }
+
+    public static function calculateMacResponseKey(KeySerialNumber $ksn, $bdk)
+    {
+        $derivedKey = self::calculateDerivedKey($ksn, $bdk);
+        $variantKey = self::calculateVariantKey($derivedKey, self::VARIANT_CONSTANT_MAC_RESPONSE);
+
+        return $variantKey;
+    }
+
+    public static function calculateDataEncryptionRequestKey(KeySerialNumber $ksn, $bdk)
+    {
+        $derivedKey = self::calculateDerivedKey($ksn, $bdk);
+        $variantKey = self::calculateVariantKey($derivedKey, self::VARIANT_CONSTANT_DATA_REQUEST);
 
         $variantKeyLeft = self::leftHalf($variantKey);
         $variantKeyRight = self::rightHalf($variantKey);
@@ -76,11 +94,29 @@ class DerivedKey
         return $result;
     }
 
-    private static function leftHalf($key) {
+    public static function calculateDataEncryptionResponseKey(KeySerialNumber $ksn, $bdk)
+    {
+        $derivedKey = self::calculateDerivedKey($ksn, $bdk);
+        $variantKey = self::calculateVariantKey($derivedKey, self::VARIANT_CONSTANT_DATA_RESPONSE);
+
+        $variantKeyLeft = self::leftHalf($variantKey);
+        $variantKeyRight = self::rightHalf($variantKey);
+
+        $encryptionKeyLeft = Utility::encrypt_3des_ede($variantKeyLeft, $variantKey);
+        $encryptionKeyRight = Utility::encrypt_3des_ede($variantKeyRight, $variantKey);
+
+        $result = strtoupper(bin2hex($encryptionKeyLeft . $encryptionKeyRight));
+
+        return $result;
+    }
+
+    private static function leftHalf($key)
+    {
         return substr($key, 0, 16);
     }
 
-    private static function rightHalf($key) {
+    private static function rightHalf($key)
+    {
         return substr($key, 16);
     }
 
