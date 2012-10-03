@@ -8,7 +8,6 @@ class DerivedKey
     /**
      * Constant used in the Shift Register
      */
-
     const _100000 = "100000";
 
     /**
