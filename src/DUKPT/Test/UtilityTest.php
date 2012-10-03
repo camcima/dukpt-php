@@ -1,8 +1,10 @@
 <?php
 
-require_once __DIR__ . '/../src/Utility.php';
+namespace DUKPT\Test;
 
-class UtilityTest extends PHPUnit_Framework_TestCase
+use DUKPT\Utility;
+
+class UtilityTest extends AbstractTest
 {
     public function testAndHexStringOffset()
     {

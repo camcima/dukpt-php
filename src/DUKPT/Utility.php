@@ -1,6 +1,8 @@
 <?php
 
-include_once('Crypt/TripleDES.php');
+namespace DUKPT;
+
+use Crypt;
 
 class Utility
 {
@@ -214,7 +216,7 @@ class Utility
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $crypt3DES = new Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 
@@ -237,7 +239,7 @@ class Utility
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $crypt3DES = new Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 

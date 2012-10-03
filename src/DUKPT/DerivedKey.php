@@ -1,7 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../src/Utility.php';
-require_once __DIR__ . '/../src/KeySerialNumber.php';
+namespace DUKPT;
 
 class DerivedKey
 {

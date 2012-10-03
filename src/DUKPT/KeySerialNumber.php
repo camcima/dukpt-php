@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../src/Utility.php';
+namespace DUKPT;
 
 class KeySerialNumber
 {

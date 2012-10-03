@@ -1,10 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../src/DerivedKey.php';
-require_once __DIR__ . '/../src/KeySerialNumber.php';
+namespace DUKPT\Test;
 
-class DerivedKeyTest extends PHPUnit_Framework_TestCase
+use DUKPT\DerivedKey;
+use DUKPT\KeySerialNumber;
+use DUKPT\Utility;
+
+class DerivedKeyTest extends AbstractTest
 {
+
     public function testDeriveFirstKey()
     {
         $bdk = '0123456789ABCDEFFEDCBA9876543210';

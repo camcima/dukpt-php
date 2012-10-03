@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="dukpt-php Test Suite">
+            <directory>./src/DUKPT/Test/</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Code Coverage -->
+    <filter>
+        <whitelist>
+            <directory>./src/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

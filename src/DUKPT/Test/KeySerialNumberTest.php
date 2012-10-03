@@ -1,9 +1,10 @@
 <?php
 
-require_once __DIR__ . '/../src/KeySerialNumber.php';
-require_once __DIR__ . '/../src/DerivedKey.php';
+namespace DUKPT\Test;
 
-class KeySerialNumberTest extends PHPUnit_Framework_TestCase
+use DUKPT\KeySerialNumber;
+
+class KeySerialNumberTest extends AbstractTest
 {
     public function testConstructor()
     {
