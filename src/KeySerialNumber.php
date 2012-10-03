@@ -4,19 +4,102 @@ require_once __DIR__ . '/../src/Utility.php';
 
 class KeySerialNumber
 {
-    const _C0C0 = 'c0c0c0c000000000c0c0c0c000000000';
+    /**
+     * Hexadecimal constant used in the calculation of the initial key
+     */
 
+    const _C0C0 = 'C0C0C0C000000000C0C0C0C000000000';
+
+    /**
+     * Issuer Identifier Number
+     * 
+     * Part of KSN (3 bytes)
+     * 
+     * @var string 
+     */
     private $issuerIdentifierNumber;
+
+    /**
+     * Customer ID
+     * 
+     * Part of KSN (1 bytes)
+     * 
+     * @var string 
+     */
     private $customerId;
+
+    /**
+     * Group ID
+     * 
+     * Part of KSN (1 bytes)
+     * 
+     * @var string 
+     */
     private $groupId;
+
+    /**
+     * Tamper-Resistant Security Module ID
+     * 
+     * Part of KSN (19 bits)
+     * 
+     * @var string 
+     */
     private $trsmId;
+
+    /**
+     * Transaction Counter
+     * 
+     * Part of KSN (21 bits)
+     * 
+     * @var string 
+     */
     private $transactionCounter;
+
+    /**
+     * Base Key ID - Left-most 8 bytes of the padded KSN
+     * 
+     * The transaction counter part is zeroed
+     * 
+     * @var string 
+     */
     private $baseKeyId;
-    private $paddedKsn;
-    private $unpaddedKsn;
-    private $initialKey;
+
+    /**
+     * KSNR - Right-most 8 bytes of the padded KSN
+     * 
+     * @var string 
+     */
     private $ksnr;
 
+    /**
+     * KSN padded to 10 bytes
+     * 
+     * @var string 
+     */
+    private $paddedKsn;
+
+    /**
+     * Unpadded KSN (8 bytes)
+     * 
+     * @var string 
+     */
+    private $unpaddedKsn;
+
+    /**
+     * Initial Key
+     * 
+     * Initial PIN loaded in the TRSM
+     * 
+     * @var string 
+     */
+    private $initialKey;
+
+    /**
+     * Constructor
+     * 
+     * @param string $ksn
+     *      KSN in hexadecimal representation
+     */
     public function __construct($ksn)
     {
         if (strlen($ksn) == 20) {
@@ -41,66 +124,114 @@ class KeySerialNumber
         $this->baseKeyId = substr(Utility::binstr2hex($binBaseKey), 0, 16);
     }
 
-    public function stripKsn($ksn)
-    {
-        if (strpos($ksn, 'FFFF') === 0) {
-            return substr($ksn, 4);
-        }
-
-        return $ksn;
-    }
-
-    public function getBaseKeyId()
-    {
-        return $this->baseKeyId;
-    }
-
-    public function getInitialKey()
-    {
-        return $this->initialKey;
-    }
-
-    public function getPaddedKsn()
-    {
-        return $this->paddedKsn;
-    }
-
-    public function getTransactionCounter()
-    {
-        return $this->transactionCounter;
-    }
-
-    public function getTrsmId()
-    {
-        return $this->trsmId;
-    }
-
+    /**
+     * Getter for the Unpadded KSN
+     * 
+     * @return string
+     *      Unpadded KSN in hexadecimal representation
+     */
     public function getUnpaddedKsn()
     {
         return $this->unpaddedKsn;
     }
 
+    /**
+     * Getter for the Padded KSN
+     * 
+     * @return string
+     *      Padded KSN in hexadecimal representation
+     */
+    public function getPaddedKsn()
+    {
+        return $this->paddedKsn;
+    }
+
+    /**
+     * Getter for the TRSM ID
+     * 
+     * @return string
+     *      TRSM ID in hexadecimal representation
+     */
+    public function getTrsmId()
+    {
+        return $this->trsmId;
+    }
+
+    /**
+     * Getter for the Transacation Counter
+     * 
+     * @return string
+     *      Transacation Counter in hexadecimal representation
+     */
+    public function getTransactionCounter()
+    {
+        return $this->transactionCounter;
+    }
+
+    /**
+     * Getter for the Base Key ID
+     * 
+     * @return string
+     *      Base Key ID in hexadecimal representation
+     */
+    public function getBaseKeyId()
+    {
+        return $this->baseKeyId;
+    }
+
+    /**
+     * Getter for the KSNR
+     * 
+     * @return string
+     *      KSNR in hexadecimal representation
+     */
     public function getKsnr()
     {
         return $this->ksnr;
     }
 
-    public function setInitialKey($initialKey)
+    /**
+     * Getter fot the Initial Key
+     * 
+     * @return string
+     *      Initial Key in hexadecimal representation
+     */
+    public function getInitialKey()
     {
-        $this->initialKey = $initialKey;
+        return $this->initialKey;
     }
 
-    public function pack()
-    {
-        return Utility::hex2bin($this->paddedKsn);
-    }
-
+    /**
+     * Calculates the Inital Key loaded in the device (TRSM)
+     * given the Base Derivation Key
+     * 
+     * @param string $bdk
+     *      Base Derivation Key in hexadecimal representation
+     */
     public function calculateIpek($bdk)
     {
         $leftInitialKey = Utility::tripleDesEncrypt($this->baseKeyId, $bdk);
         $rightInitialKey = Utility::tripleDesEncrypt($this->baseKeyId, Utility::xorHexString($bdk, self::_C0C0));
 
         $this->initialKey = $leftInitialKey . $rightInitialKey;
+    }
+
+    /**
+     * Strip padding from the KSN
+     * 
+     * @param string $ksn
+     *      KSN in hexadecimal representation
+     * 
+     * @return string
+     *      
+     */
+    private function stripKsn($ksn)
+    {
+        if (strlen($ksn) == 20 && strpos($ksn, 'FFFF') === 0) {
+            return substr($ksn, 4);
+        }
+
+        return $ksn;
     }
 
 }

@@ -4,26 +4,43 @@ include_once('Crypt/TripleDES.php');
 
 class Utility
 {
-    public static function hex2bin($h)
+
+    /**
+     * Convert hexadecimal string to binary
+     * 
+     * This function is available in PHP > 5.4
+     * 
+     * @param string $hexString
+     * 
+     * @return binary
+     */
+    public static function hex2bin($hexString)
     {
-        if (!is_string($h)) return null;
+        if (!is_string($hexString)) return null;
         $r = '';
-        for ($a = 0; $a < strlen($h); $a += 2) {
-            $r .= chr(hexdec($h{$a} . $h{($a + 1)}));
+        for ($a = 0; $a < strlen($hexString); $a += 2) {
+            $r .= chr(hexdec($hexString{$a} . $hexString{($a + 1)}));
         }
 
         return $r;
     }
 
-    public static function hex2binstr($hexInput)
+    /**
+     * Convert hexadecimal string to its binary string representation
+     * 
+     * @param string $hexString
+     * 
+     * @return string
+     */
+    public static function hex2binstr($hexString)
     {
-        if (strlen($hexInput) % 2 == 1) {
-            $hexInput = '0' . $hexInput;
+        if (strlen($hexString) % 2 == 1) {
+            $hexString = '0' . $hexString;
         }
 
         $binstr = '';
-        for ($i = 0; $i < strlen($hexInput); $i = $i + 2) {
-            $hex = substr($hexInput, $i, 2);
+        for ($i = 0; $i < strlen($hexString); $i = $i + 2) {
+            $hex = substr($hexString, $i, 2);
 
             $binstr .= str_pad(decbin(hexdec($hex)), 8, '0', STR_PAD_LEFT);
         }
@@ -31,10 +48,17 @@ class Utility
         return $binstr;
     }
 
-    public static function binstr2hex($binstrInput)
+    /**
+     * Convert a binary string to its hexadecimal string representation
+     * 
+     * @param string $binaryString
+     * 
+     * @return string
+     */
+    public static function binstr2hex($binaryString)
     {
 
-        $paddedBinstrInput = str_pad($binstrInput, ceil(strlen($binstrInput) / 8) * 8, '0', STR_PAD_LEFT);
+        $paddedBinstrInput = str_pad($binaryString, ceil(strlen($binaryString) / 8) * 8, '0', STR_PAD_LEFT);
 
         $hex = '';
         for ($i = strlen($paddedBinstrInput); $i > 0; $i = $i - 8) {
@@ -46,31 +70,19 @@ class Utility
     }
 
     /**
-     * Convert two hex strings to byte[] and AND them
+     * Bitwise AND operation between hexadecimal strings with an offset
      *
-     * @param input
-     *            First string
-     * @param mask
-     *            Second string
-     * @return ANDed result
+     * @param string $input
+     *      First hexadecimal string
+     * @param string $mask
+     *      Second hexadecimal string
+     * @param int $offset
+     *      Offset in bits
+     * 
+     * @return string
+     *      ANDed result
      */
-    public static function andHexString($input, $mask)
-    {
-        return self::andHexStringOffset($input, $mask, 0);
-    }
-
-    /**
-     * Convert two hex strings to byte[] and AND them from the offset
-     *
-     * @param input
-     *            First string
-     * @param mask
-     *            Second string
-     * @param offset
-     *            Offset to AND from
-     * @return ANDed result
-     */
-    public static function andHexStringOffset($input, $mask, $offset)
+    public static function andHexString($input, $mask, $offset = 0)
     {
         $binStr1 = self::hex2binstr($input);
         $binStr2 = self::hex2binstr($mask);
@@ -91,17 +103,19 @@ class Utility
     }
 
     /**
-     * Convert two hex strings to byte[] and OR them from the binary offset
+     * Bitwise OR operation between hexadecimal strings with an offset
      *
-     * @param input
-     *            First string
-     * @param mask
-     *            Second string
-     * @param offset
-     *            Binary Offset
-     * @return ORed result
+     * @param string $input
+     *      First hexadecimal string
+     * @param string $mask
+     *      Second hexadecimal string
+     * @param int $offset
+     *      Offset in bits
+     * 
+     * @return string
+     *      ORed result
      */
-    public static function orHexStringOffset($input, $mask, $offset = 0)
+    public static function orHexString($input, $mask, $offset = 0)
     {
         $binStr1 = self::hex2binstr($input);
         $binStr2 = self::hex2binstr($mask);
@@ -122,20 +136,24 @@ class Utility
     }
 
     /**
-     * Convert two hex strings to byte[] and XOR them
+     * Bitwise XOR operation between hexadecimal strings
      *
-     * @param input
-     *            First string
-     * @param mask
-     *            Second string
-     * @return XORed result
+     * @param string $input
+     *      First hexadecimal string
+     * @param string $mask
+     *      Second hexadecimal string
+     * @param int $offset
+     *      Offset in bits
+     * 
+     * @return string
+     *      XORed result
      */
-    public static function xorHexString($input, $mask)
+    public static function xorHexString($input, $mask, $offset = 0)
     {
         $binStr1 = self::hex2binstr($input);
         $binStr2 = self::hex2binstr($mask);
 
-        $binXor = '';
+        $binXor = substr($binStr1, 0, $offset);
         for ($i = 0; $i < strlen($binStr1); $i++) {
             if ($binStr1[$i] == $binStr2[$i]) {
                 $binXor .= '0';
@@ -148,25 +166,49 @@ class Utility
     }
 
     /**
-     * Perform a shift right operation on a hex string
+     * Perform a shift right operation on a hexadecimal string
      *
-     * @param str
-     *            Input string
-     * @return Shifted string
+     * @param string $hexString
+     *      Input string
+     * 
+     * @return string
+     *      Shifted string
      */
-    public static function shiftRightHexString($str)
+    public static function shiftRightHexString($hexString)
     {
-        $r = hexdec($str) >> 1;
-        $result = str_pad(decbin($r), strlen(decbin(hexdec($str))), '0', STR_PAD_LEFT);
+        $r = hexdec($hexString) >> 1;
+        $result = str_pad(decbin($r), strlen(decbin(hexdec($hexString))), '0', STR_PAD_LEFT);
         return dechex(bindec($result));
     }
 
-    public static function desEncrypt($data, $key)
+    /**
+     * DES Encrypt in ECB mode
+     * 
+     * @param string $hexData
+     *      Data in hexadecimal representation
+     * @param string $hexKey
+     *      Key in hexadecimal representation
+     * 
+     * @return string
+     *      Encrypted data in hexadecimal representation
+     */
+    public static function desEncrypt($hexData, $hexKey)
     {
-        $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($key), self::hex2bin($data), MCRYPT_MODE_ECB);
+        $encryptedData = mcrypt_encrypt(MCRYPT_DES, self::hex2bin($hexKey), self::hex2bin($hexData), MCRYPT_MODE_ECB);
         return strtoupper(bin2hex($encryptedData));
     }
 
+    /**
+     * 3-DES Encrypt in EDE-CBC3 Mode
+     * 
+     * @param string $hexData
+     *      Data in hexadecimal representation
+     * @param string $hexKey
+     *      Key in hexadecimal representation
+     * 
+     * @return string
+     *      Encrypted data in hexadecimal representation
+     */
     public static function tripleDesEncrypt($hexData, $hexKey)
     {
         //fix Crypt Library padding
@@ -179,7 +221,18 @@ class Utility
         return strtoupper(bin2hex($crypt3DES->encrypt(Utility::hex2bin($hexData))));
     }
 
-    public static function tripleDesDecrypt($hexData, $hexKey)
+    /**
+     * 3-DES Decrypt in EDE-CBC3 Mode
+     * 
+     * @param string $hexEncryptedData
+     *      Encrypted Data in hexadecimal representation
+     * @param string $hexKey
+     *      Key in hexadecimal representation
+     * 
+     * @return string
+     *      Decrypted data in hexadecimal representation
+     */
+    public static function tripleDesDecrypt($hexEncryptedData, $hexKey)
     {
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
@@ -188,7 +241,7 @@ class Utility
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 
-        return strtoupper(bin2hex($crypt3DES->decrypt(Utility::hex2bin($hexData))));
+        return strtoupper(bin2hex($crypt3DES->decrypt(Utility::hex2bin($hexEncryptedData))));
     }
 
 }
