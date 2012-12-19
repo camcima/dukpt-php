@@ -85,7 +85,7 @@ class UtilityTest extends AbstractTest
         $data = '0123456789ABCDEF';
         
         $expected = $data;
-        $actual = Utility::tripleDesDecrypt(Utility::tripleDesEncrypt($data, $key), $key);
+        $actual = Utility::tripleDesDecrypt(Utility::tripleDesEncrypt($data, $key), $key, true);
         
         $this->assertEquals($expected, $actual);
     }

@@ -201,6 +201,23 @@ class Utility
     }
 
     /**
+     * DES Decrypt in ECB mode
+     * 
+     * @param string $hexData
+     *      Ecrypted data in hexadecimal representation
+     * @param string $hexKey
+     *      Key in hexadecimal representation
+     * 
+     * @return string
+     *      Decrypted data in hexadecimal representation
+     */
+    public static function desDecrypt($hexData, $hexKey)
+    {
+        $decryptedData = mcrypt_decrypt(MCRYPT_DES, self::hex2bin($hexKey), self::hex2bin($hexData), MCRYPT_MODE_ECB);
+        return strtoupper(bin2hex($decryptedData));
+    }
+
+    /**
      * 3-DES Encrypt in EDE-CBC3 Mode
      * 
      * @param string $hexData
@@ -230,20 +247,65 @@ class Utility
      *      Encrypted Data in hexadecimal representation
      * @param string $hexKey
      *      Key in hexadecimal representation
+     * @param bool   $useDesModeCBC3
+     *      Use DES CBC3 Mode
      * 
      * @return string
      *      Decrypted data in hexadecimal representation
      */
-    public static function tripleDesDecrypt($hexEncryptedData, $hexKey)
+    public static function tripleDesDecrypt($hexEncryptedData, $hexKey, $useDesModeCBC3 = false)
     {
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        if ($useDesModeCBC3) {
+            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3); // IDTech uses mode CRYPT_DES_MODE_CBC3
+        } else {
+            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_ECB); // Chinese uses mode CRYPT_DES_MODE_ECB
+        }
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 
         return strtoupper(bin2hex($crypt3DES->decrypt(Utility::hex2bin($hexEncryptedData))));
     }
-
+    
+    /**
+     * Get a specific byte in a hex string
+     * 
+     * @param string $hexString
+     * @param string $byteNumber
+     * 
+     * @return string Byte
+     */
+    public static function getByteOnHexString($hexString, $byteNumber) {
+        return substr($hexString, $byteNumber * 2, 2);
+    }
+    
+    /**
+     * Set a specific byte in a hex string
+     * 
+     * @param string $hexString
+     * @param string $byte
+     * @param int    $byteNumber
+     * 
+     * @return string Hex String
+     */
+    public static function setByteOnHexString($hexString, $byte, $byteNumber) {
+        
+        $result = '';
+        
+        // if not the first byte
+        if ($byteNumber > 0) {
+            $result .= substr($hexString, 0, ($byteNumber * 2));
+        }
+        
+        $result .= strtoupper($byte);
+        
+        // if not the last byte
+        if ($byteNumber < strlen($hexString) / 2) {
+            $result .= substr($hexString, ($byteNumber + 1) * 2);
+        }
+        
+        return $result;
+    }
 }

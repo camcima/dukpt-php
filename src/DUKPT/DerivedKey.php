@@ -80,7 +80,114 @@ class DerivedKey
 
         return $curKey;
     }
+    
+    /**
+     * Calculate Derived Key for the given KSN
+     * 
+     * Chinese Version of the Algorithm
+     * 
+     * @param KeySerialNumber $ksn
+     *      Key Serial Number
+     * @param string $bdk
+     *      Hexadecimal representation of the Base Derivation Key
+     * 
+     * @return string
+     *      Derived Key in hexadecimal representation
+     */
+    public static function getNowKey(KeySerialNumber $ksn, $bdk) {
+        $hexNowKey = $bdk;
+        $tmpCount = hexdec($ksn->getTransactionCounter());
+        $j = 0;
+        
+        for ($i = 0; $i < 21; $i++) {
+            if ($tmpCount & 0x01) {
+                $j++;
+            }
+            $tmpCount = $tmpCount >> 1;
+        }
+        
+        $tmpCount = hexdec($ksn->getTransactionCounter());
+        $k =0;
+        $x = 0x100000;
+        while ($j--) {
+            for ($i = 0; $i < 21; $i++) {
+                if ($tmpCount & 0x100000) {
+                    break;
+                }
+                $tmpCount <<= 1;
+                $x >>= 1;
+            }
+            $k += $x;
+            $tmpCount <<= 1;
+            $x >>= 1;
+            $ksn = self::combineKsn($ksn, $k);
+            $hexNowKey = self::generateKey($hexNowKey, $ksn);
+        }
+        
+        return $hexNowKey;
+    }
 
+    /**
+     * Transform KSN
+     * 
+     * Chinese code
+     * 
+     * @param \DUKPT\KeySerialNumber $ksn
+     * @param int $transactionCounter
+     * 
+     * @return \DUKPT\KeySerialNumber
+     */
+    protected static function combineKsn(KeySerialNumber $ksn, $transactionCounter)
+    {
+        $hexKsn = $ksn->getPaddedKsn();
+        $hexKsn7 = Utility::getByteOnHexString($hexKsn, 7);
+        $hexKsn7 = Utility::andHexString($hexKsn7, 'E0');
+        $hexKsn = Utility::setByteOnHexString($hexKsn, $hexKsn7, 7);
+        $hexKsn = Utility::setByteOnHexString($hexKsn, '00', 8);
+        $hexKsn = Utility::setByteOnHexString($hexKsn, '00', 9);
+        
+        $hexTemp = Utility::andHexString(dechex($transactionCounter >> 16), '1F');
+        $hexKsn7 = Utility::getByteOnHexString($hexKsn, 7);
+        $hexKsn7 = dechex(hexdec($hexKsn7) + hexdec($hexTemp));
+        $hexKsn = Utility::setByteOnHexString($hexKsn, $hexKsn7, 7);
+
+        $hexTemp = Utility::andHexString(dechex($transactionCounter >> 8), 'FF');
+        $hexKsn8 = Utility::getByteOnHexString($hexKsn, 8);
+        $hexKsn8 = dechex(hexdec($hexKsn8) + hexdec($hexTemp));
+        $hexKsn = Utility::setByteOnHexString($hexKsn, $hexKsn8, 8);
+
+        $hexTemp = Utility::andHexString(dechex($transactionCounter), 'FF');
+        $hexKsn9 = Utility::getByteOnHexString($hexKsn, 9);
+        $hexKsn9 = dechex(hexdec($hexKsn9) + hexdec($hexTemp));
+        $hexKsn = Utility::setByteOnHexString($hexKsn, $hexKsn9, 9);
+
+        return new KeySerialNumber($hexKsn);
+    }
+    
+    /**
+     * Generate Key
+     * 
+     * Chinese Code
+     * 
+     * @param string $hexNowKey
+     * @param \DUKPT\KeySerialNumber $ksn
+     * 
+     * @return string
+     */
+    protected static function generateKey($hexNowKey, KeySerialNumber $ksn) {
+        $hexCr1 = substr($ksn->getUnpaddedKsn(), 0, 16);
+        $hexCr2 = Utility::xorHexString($hexCr1, substr($hexNowKey, 16, 16));
+        $hexCr2 = Utility::desEncrypt(substr($hexCr2,0, 16), substr($hexNowKey, 0, 16));
+        $hexCr2 = Utility::xorHexString($hexCr2, substr($hexNowKey, 16, 16));
+        $hexNowKey = Utility::xorHexString(KeySerialNumber::_C0C0, substr($hexNowKey, 0, 32));
+        $hexCr1 = Utility::xorHexString($hexCr1, substr($hexNowKey, 16, 16));
+        $hexCr1 = Utility::desEncrypt(substr($hexCr1,0, 16), substr($hexNowKey, 0, 16));
+        $hexCr1 = Utility::xorHexString($hexCr1, substr($hexNowKey, 16, 16));
+        $hexNowKey = $hexCr1 . $hexCr2;
+        
+        return $hexNowKey;
+    }
+    
     /**
      * Calculate the Variant Key
      * 
