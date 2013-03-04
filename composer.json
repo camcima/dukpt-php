@@ -1,9 +1,9 @@
 {
-    "name": "yuriteixeira/dukpt-php",
+    "name": "camcima/dukpt-php",
     "type": "library",
     "description": "DUKPT implementation in PHP",
     "keywords": ["dukpt", "php", "des", "3des", "tripledes", "cryptography", "transaction", "encryption", "decryption"],
-    "homepage": "https://github.com/yuriteixeira/dukpt-php",
+    "homepage": "https://github.com/camcima/dukpt-php",
     "license": "MIT",
     "authors": [
         {
