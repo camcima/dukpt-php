@@ -83,7 +83,7 @@ class DerivedKeyTest extends AbstractTest
 
         $key = new KeySerialNumber($ksn);
         $encryptionKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
-        $actual = Utility::hex2bin(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey, true));
+        $actual = Utility::hex2bin(Utility::removePadding(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey, true)));
         $expected = '%B4266841088889999^BUSH JR/GEORGE W.MR^0809101100001100000000046000000?!';
 
         $this->assertEquals($expected, $actual);
@@ -97,9 +97,9 @@ class DerivedKeyTest extends AbstractTest
         
         $key = new KeySerialNumber($ksn);
         $encryptionKey = DerivedKey::calculateDataEncryptionRequestKey($key, $bdk);
-        $actual = Utility::hex2bin(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey, true));
+        $actual = Utility::hex2bin(Utility::removePadding(Utility::tripleDesDecrypt($encryptedHexData, $encryptionKey, true)));
 
-        $expected = ";4266841088889999=080910110000046?0\000\000\000\000\000";
+        $expected = ";4266841088889999=080910110000046?0";
 
         $this->assertEquals($expected, $actual);
     }

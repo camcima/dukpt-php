@@ -6,7 +6,6 @@ use Crypt;
 
 class Utility
 {
-
     /**
      * Convert hexadecimal string to binary
      * 
@@ -268,7 +267,7 @@ class Utility
 
         return strtoupper(bin2hex($crypt3DES->decrypt(Utility::hex2bin($hexEncryptedData))));
     }
-    
+
     /**
      * Get a specific byte in a hex string
      * 
@@ -277,10 +276,11 @@ class Utility
      * 
      * @return string Byte
      */
-    public static function getByteOnHexString($hexString, $byteNumber) {
+    public static function getByteOnHexString($hexString, $byteNumber)
+    {
         return substr($hexString, $byteNumber * 2, 2);
     }
-    
+
     /**
      * Set a specific byte in a hex string
      * 
@@ -290,22 +290,37 @@ class Utility
      * 
      * @return string Hex String
      */
-    public static function setByteOnHexString($hexString, $byte, $byteNumber) {
-        
+    public static function setByteOnHexString($hexString, $byte, $byteNumber)
+    {
+
         $result = '';
-        
+
         // if not the first byte
         if ($byteNumber > 0) {
             $result .= substr($hexString, 0, ($byteNumber * 2));
         }
-        
+
         $result .= strtoupper($byte);
-        
+
         // if not the last byte
         if ($byteNumber < strlen($hexString) / 2) {
             $result .= substr($hexString, ($byteNumber + 1) * 2);
         }
-        
+
         return $result;
     }
+
+    /**
+     * Remove NUL padding from string
+     * 
+     * @param string $hexString
+     * @return string
+     */
+    public static function removePadding($hexString)
+    {
+        $binString = self::hex2bin($hexString);
+        $unpaddedBinString = rtrim($binString, "\0");
+        return bin2hex($unpaddedBinString);
+    }
+
 }
