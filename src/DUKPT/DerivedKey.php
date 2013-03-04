@@ -61,7 +61,7 @@ class DerivedKey
             $temp = Utility::andHexString($shiftr, $r3);
 
             if ($temp != 0) {
-                $r8 = Utility::orHexString($r8, $shiftr, 58);
+                $r8 = Utility::orHexString($r8, $shiftr, 43);
                 $r8a = Utility::xorHexString($r8, self::rightHalf($curKey));
                 $r8a = Utility::desEncrypt($r8a, self::leftHalf($curKey));
                 $r8a = Utility::xorHexString($r8a, self::rightHalf($curKey));
