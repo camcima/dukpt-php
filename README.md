@@ -80,13 +80,17 @@ use DUKPT\DerivedKey;
 use DUKPT\KeySerialNumber;
 use DUKPT\Utility;
 
-$decryptedData = Utility::hex2bin(Utility::removePadding(Utility::tripleDesDecrypt($encryptedHexData, $decryptionKey, true)));
+$decryptedData = Utility::hex2bin(
+                    Utility::removePadding(
+                        Utility::tripleDesDecrypt($encryptedHexData, $decryptionKey, true)
+                    )
+                  );
 ```
 
 The last parameter of the `tripleDesDecrypt` method changes the encryption mode to CBC3 (true), while the normal mode is ECB. I did this because we tested a chinese device that used this DES mode.
 
 ## Notes ##
 
-Be aware that there are some DES/3DES/AES implementation differences between devices, as DES has many modes (ECB, CBC, CFB, OFB, ...).
+Be aware that there are some DES/3DES/AES implementation differences between devices, as DES has many modes (ECB, CBC, CFB, OFB, ...). If it doesn't work, try another mode...
 
 
