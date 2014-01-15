@@ -89,6 +89,8 @@ $decryptedData = Utility::hex2bin(
 
 The last parameter of the `tripleDesDecrypt` method changes the encryption mode to CBC3 (true), while the normal mode is ECB. I did this because we tested a chinese device that used this DES mode.
 
+If you want to see working examples, checkout the [tests](https://github.com/camcima/dukpt-php/tree/master/src/DUKPT/Test "tests").
+
 ## Notes ##
 
 Be aware that there are some DES/3DES/AES implementation differences between devices, as DES has many modes (ECB, CBC, CFB, OFB, ...). If it doesn't work, try another mode...
