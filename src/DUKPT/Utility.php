@@ -8,11 +8,11 @@ class Utility
 {
     /**
      * Convert hexadecimal string to binary
-     * 
+     *
      * This function is available in PHP > 5.4
-     * 
+     *
      * @param string $hexString
-     * 
+     *
      * @return binary
      */
     public static function hex2bin($hexString)
@@ -28,9 +28,9 @@ class Utility
 
     /**
      * Convert hexadecimal string to its binary string representation
-     * 
+     *
      * @param string $hexString
-     * 
+     *
      * @return string
      */
     public static function hex2binstr($hexString)
@@ -51,9 +51,9 @@ class Utility
 
     /**
      * Convert a binary string to its hexadecimal string representation
-     * 
+     *
      * @param string $binaryString
-     * 
+     *
      * @return string
      */
     public static function binstr2hex($binaryString)
@@ -79,7 +79,7 @@ class Utility
      *      Second hexadecimal string
      * @param int $offset
      *      Offset in bits
-     * 
+     *
      * @return string
      *      ANDed result
      */
@@ -112,7 +112,7 @@ class Utility
      *      Second hexadecimal string
      * @param int $offset
      *      Offset in bits
-     * 
+     *
      * @return string
      *      ORed result
      */
@@ -145,7 +145,7 @@ class Utility
      *      Second hexadecimal string
      * @param int $offset
      *      Offset in bits
-     * 
+     *
      * @return string
      *      XORed result
      */
@@ -171,7 +171,7 @@ class Utility
      *
      * @param string $hexString
      *      Input string
-     * 
+     *
      * @return string
      *      Shifted string
      */
@@ -184,12 +184,12 @@ class Utility
 
     /**
      * DES Encrypt in ECB mode
-     * 
+     *
      * @param string $hexData
      *      Data in hexadecimal representation
      * @param string $hexKey
      *      Key in hexadecimal representation
-     * 
+     *
      * @return string
      *      Encrypted data in hexadecimal representation
      */
@@ -201,12 +201,12 @@ class Utility
 
     /**
      * DES Decrypt in ECB mode
-     * 
+     *
      * @param string $hexData
      *      Ecrypted data in hexadecimal representation
      * @param string $hexKey
      *      Key in hexadecimal representation
-     * 
+     *
      * @return string
      *      Decrypted data in hexadecimal representation
      */
@@ -218,12 +218,12 @@ class Utility
 
     /**
      * 3-DES Encrypt in EDE-CBC3 Mode
-     * 
+     *
      * @param string $hexData
      *      Data in hexadecimal representation
      * @param string $hexKey
      *      Key in hexadecimal representation
-     * 
+     *
      * @return string
      *      Encrypted data in hexadecimal representation
      */
@@ -232,7 +232,7 @@ class Utility
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES = new \Crypt_TripleDES(\Crypt_TripleDES::MODE_CBC3);
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 
@@ -241,14 +241,14 @@ class Utility
 
     /**
      * 3-DES Decrypt in EDE-CBC3 Mode
-     * 
+     *
      * @param string $hexEncryptedData
      *      Encrypted Data in hexadecimal representation
      * @param string $hexKey
      *      Key in hexadecimal representation
      * @param bool   $useDesModeCBC3
      *      Use DES CBC3 Mode
-     * 
+     *
      * @return string
      *      Decrypted data in hexadecimal representation
      */
@@ -258,9 +258,9 @@ class Utility
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
         if ($useDesModeCBC3) {
-            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3); // IDTech uses mode CRYPT_DES_MODE_CBC3
+            $crypt3DES = new \Crypt_TripleDES(\Crypt_TripleDES::MODE_CBC3); // IDTech uses mode \Crypt_TripleDES::MODE_CBC3
         } else {
-            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_ECB); // Chinese uses mode CRYPT_DES_MODE_ECB
+            $crypt3DES = new \Crypt_TripleDES(\Crypt_TripleDES::MODE_ECB); // Chinese uses mode \Crypt_TripleDES::MODE_ECB
         }
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
@@ -270,10 +270,10 @@ class Utility
 
     /**
      * Get a specific byte in a hex string
-     * 
+     *
      * @param string $hexString
      * @param string $byteNumber
-     * 
+     *
      * @return string Byte
      */
     public static function getByteOnHexString($hexString, $byteNumber)
@@ -283,11 +283,11 @@ class Utility
 
     /**
      * Set a specific byte in a hex string
-     * 
+     *
      * @param string $hexString
      * @param string $byte
      * @param int    $byteNumber
-     * 
+     *
      * @return string Hex String
      */
     public static function setByteOnHexString($hexString, $byte, $byteNumber)
@@ -312,7 +312,7 @@ class Utility
 
     /**
      * Remove NUL padding from string
-     * 
+     *
      * @param string $hexString
      * @return string
      */
