@@ -3,6 +3,7 @@
 namespace DUKPT;
 
 use Crypt;
+use phpseclib\Crypt\TripleDES;
 
 class Utility
 {
@@ -232,7 +233,7 @@ class Utility
         //fix Crypt Library padding
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
-        $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3);
+        $crypt3DES = new TripleDES(TripleDES::MODE_CBC3);
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
 
@@ -258,9 +259,9 @@ class Utility
         $hexKey = $hexKey . substr($hexKey, 0, 16);
 
         if ($useDesModeCBC3) {
-            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_CBC3); // IDTech uses mode CRYPT_DES_MODE_CBC3
+            $crypt3DES = new TripleDES(TripleDES::MODE_CBC3); // IDTech uses mode CRYPT_DES_MODE_CBC3
         } else {
-            $crypt3DES = new \Crypt_TripleDES(CRYPT_DES_MODE_ECB); // Chinese uses mode CRYPT_DES_MODE_ECB
+            $crypt3DES = new TripleDES(TripleDES::MODE_ECB); // Chinese uses mode CRYPT_DES_MODE_ECB
         }
         $crypt3DES->setKey(Utility::hex2bin($hexKey));
         $crypt3DES->disablePadding();
